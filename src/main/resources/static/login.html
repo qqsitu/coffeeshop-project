@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Login - CoffeeShop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <label>Email: <input type="email" id="email" required /></label>
+      <label>Password: <input type="password" id="password" required /></label>
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <div id="login-result"></div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        const resp = await fetch(`/api/customers/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+        const user = await resp.json();
+        if (!user || !user.user_id) {
+          document.getElementById('login-result').textContent = 'Login failed';
+          return;
+        }
+        // store user info in localStorage
+        localStorage.setItem('coffee_user', JSON.stringify(user));
+        document.getElementById('login-result').textContent = `Logged in as ${user.f_name}`;
+        // update UI and redirect to menu
+        setTimeout(() => location.href = 'menu.html', 800);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('login-result').textContent = 'Error during login';
+      }
+    });
+  </script>
+</body>
+</html>

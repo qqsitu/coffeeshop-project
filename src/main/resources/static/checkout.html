@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Checkout - CoffeeShop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>CoffeeShop</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="orders.html">My Orders</a>
+      <a href="login.html" id="login-link">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Checkout</h2>
+
+    <section id="cart-section">
+      <h3>Your Items</h3>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div>Subtotal: $<span id="cart-total">0.00</span></div>
+      </div>
+    </section>
+
+    <section id="checkout-form">
+      <h3>Checkout Details</h3>
+      <label>
+        Logged-in user ID:
+        <input id="user-id" type="number" placeholder="Enter your user id" />
+      </label>
+
+      <label>
+        Payment method:
+        <select id="payment-method">
+          <option>Credit Card</option>
+          <option>Cash</option>
+          <option>Apple Pay</option>
+        </select>
+      </label>
+
+      <button id="place-order" class="btn">Place Order</button>
+
+      <div id="checkout-result" class="notice"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.cartUI.refreshCartView();
+      document.getElementById('place-order').addEventListener('click', async () => {
+        const userId = document.getElementById('user-id').value;
+        if (!userId) {
+          alert('Please enter your user id (or log in).');
+          return;
+        }
+
+        // Build order total from cart
+        const cart = window.cart.get();
+        if (!cart.length) { alert('Cart is empty'); return; }
+
+        const total = window.cart.total();
+        // Place order: POST /api/orders?userId=...
+        try {
+          const orderResp = await fetch(`/api/orders?userId=${encodeURIComponent(userId)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ total: total, status: 'PLACED' })
+          });
+          const order = await orderResp.json();
+
+          // Then create payment record
+          const payResp = await fetch(`/api/payments?orderId=${order.order_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: document.getElementById('payment-method').value })
+          });
+          const payment = await payResp.json();
+
+          // Clear cart
+          window.cart.clear();
+          window.cartUI.refreshCartView();
+
+          document.getElementById('checkout-result').textContent = `Order #${order.order_id} placed. Payment id: ${payment.payment_id}`;
+        } catch (e) {
+          console.error(e);
+          alert('There was a problem placing the order.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

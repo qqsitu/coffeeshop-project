@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Menu - CoffeeShop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>CoffeeShop</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="orders.html">My Orders</a>
+      <a href="login.html" id="login-link">Login</a>
+      <button id="view-cart">Cart (<span id="cart-count">0</span>)</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Menu</h2>
+    <div id="menu-list" class="grid"></div>
+  </main>
+
+  <div id="cart-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Your Cart</h3>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div>Total: $<span id="cart-total">0.00</span></div>
+        <div>
+          <a href="checkout.html" class="btn">Checkout</a>
+          <button id="close-cart" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // page-specific: load menu on page open
+    document.addEventListener('DOMContentLoaded', () => {
+      window.api.loadMenuInto('#menu-list');
+    });
+  </script>
+</body>
+</html>
