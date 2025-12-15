@@ -1,40 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>My Orders - CoffeeShop</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>My Orders</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/app.js" defer></script>
 </head>
 <body>
-  <header><h1>CoffeeShop — Orders</h1></header>
-  <main class="container">
-    <div>
-      <label>User ID: <input id="user-id" /></label>
-      <button id="load-orders" class="btn">Load Orders</button>
-    </div>
-    <div id="orders-list"></div>
-  </main>
+<header>
+  <h1>Coffee Shop</h1>
+  <nav><a href="menu.html">Menu</a></nav>
+</header>
 
-  <script src="app.js"></script>
-  <script>
-    document.getElementById('load-orders').addEventListener('click', async () => {
-      const userId = document.getElementById('user-id').value;
-      if (!userId) return alert('Enter user id');
-      const resp = await fetch(`/api/orders/user/${encodeURIComponent(userId)}`);
-      const orders = await resp.json();
-      const out = document.getElementById('orders-list');
-      out.innerHTML = '';
-      if (!orders.length) out.textContent = 'No orders';
-      orders.forEach(o => {
-        out.innerHTML += `<div class="order-card">
-          <strong>Order #${o.order_id}</strong>
-          <div>Date: ${new Date(o.order_date).toLocaleString()}</div>
-          <div>Total: $${o.total}</div>
-          <div>Status: ${o.status}</div>
-        </div>`;
-      });
-    });
-  </script>
+<div class="container">
+  <h2>My Orders</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Customer</th><th>Total</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="orders-container">
+    </tbody>
+  </table>
+</div>
 </body>
 </html>

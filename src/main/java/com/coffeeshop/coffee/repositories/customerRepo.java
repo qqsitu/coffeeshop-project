@@ -1,6 +1,8 @@
 package com.coffeeshop.coffee.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.coffeeshop.coffee.entities.customer;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface customerRepo extends JpaRepository<customer, Long> {}
+public interface customerRepo extends JpaRepository<customer, Long> {
+    customer findByEmail(String email);
+}

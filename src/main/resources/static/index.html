@@ -1,61 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>CoffeeShop</title>
+  <meta charset="UTF-8">
+  <title>Coffee Shop Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>CoffeeShop</h1>
-    <nav>
-      <a href="menu.html">Menu</a>
-      <a href="orders.html">My Orders</a>
-      <a href="login.html" id="login-link">Login</a>
-      <a href="register.html">Register</a>
-      <button id="view-cart">Cart (<span id="cart-count">0</span>)</button>
-    </nav>
+    <h1>Coffee Shop</h1>
   </header>
 
-  <main class="container">
-    <section>
-      <h2>Welcome!</h2>
-      <p>Browse the menu and add items to your order. When you're ready, go to <a href="checkout.html">Checkout</a>.</p>
-    </section>
-  </main>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <label>Email: <input type="email" id="email" required></label>
+      <label>Password: <input type="password" id="password" required></label>
+      <button type="submit" class="btn">Log In</button>
+    </form>
 
-  <div id="cart-modal" class="modal hidden">
-    <div class="modal-content">
-      <h3>Your Cart</h3>
-      <div id="cart-items"></div>
-      <div class="cart-footer">
-        <div>Total: $<span id="cart-total">0.00</span></div>
-        <div>
-          <a href="checkout.html" class="btn">Checkout</a>
-          <button id="close-cart" class="btn secondary">Close</button>
-        </div>
-      </div>
-    </div>
+    <p class="text-center">
+      Don't have an account? 
+      <a href="signup.html" class="btn secondary" id="register-link">Register</a>
+    </p>
   </div>
 
   <script src="app.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Coffee Shop</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Coffee Shop Menu</h1>
-
-    <button onclick="loadMenu()">Menu</button>
-    <button onclick="loadCart()">Cart</button>
-
-    <div id="menu"></div>
-
-    <script src="app.js"></script>
 </body>
 </html>

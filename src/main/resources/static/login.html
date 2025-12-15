@@ -1,45 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Login - CoffeeShop</title>
+  <meta charset="UTF-8">
+  <title>Coffee Shop Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="container">
-    <h2>Login</h2>
-    <form id="login-form">
-      <label>Email: <input type="email" id="email" required /></label>
-      <label>Password: <input type="password" id="password" required /></label>
-      <button type="submit" class="btn">Login</button>
-    </form>
-    <div id="login-result"></div>
-  </main>
+  <header>
+    <h1>Coffee Shop</h1>
+  </header>
 
-  <script src="app.js"></script>
-  <script>
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        const resp = await fetch(`/api/customers/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-        const user = await resp.json();
-        if (!user || !user.user_id) {
-          document.getElementById('login-result').textContent = 'Login failed';
-          return;
-        }
-        // store user info in localStorage
-        localStorage.setItem('coffee_user', JSON.stringify(user));
-        document.getElementById('login-result').textContent = `Logged in as ${user.f_name}`;
-        // update UI and redirect to menu
-        setTimeout(() => location.href = 'menu.html', 800);
-      } catch (err) {
-        console.error(err);
-        document.getElementById('login-result').textContent = 'Error during login';
-      }
-    });
-  </script>
+  <div class="login-wrapper">
+  <div class="container login-container">
+    <h2>Login</h2>
+    <form id="login-form" class="login-form">
+      <label>Email: 
+        <input type="email" id="email" required>
+      </label>
+      <label>Password: 
+        <input type="password" id="password" required>
+      </label>
+      <button type="submit" class="btn">Log In</button>
+    </form>
+
+    <p class="text-center">
+      Don't have an account? 
+      <a href="signup.html" class="btn secondary" id="register-link">Register</a>
+    </p>
+  </div>
+  </div>
+
+  <script src="/app.js"></script>
 </body>
 </html>
+

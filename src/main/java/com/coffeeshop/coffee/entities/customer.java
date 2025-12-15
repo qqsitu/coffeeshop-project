@@ -13,9 +13,13 @@ public class customer {
     private String f_name;
     private String l_name;
     private String email;
+
+    @Column(name = "password")
     private String password;
 
-    // Getters and setters
+    @Column(name = "role")
+    private String role;
+
     public Long getUser_id() { return user_id; }
     public void setUser_id(Long user_id) { this.user_id = user_id; }
 
@@ -30,4 +34,8 @@ public class customer {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    
 }

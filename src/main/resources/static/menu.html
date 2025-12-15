@@ -1,47 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Menu - CoffeeShop</title>
+  <meta charset="UTF-8">
+  <title>Coffee Shop Menu</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>CoffeeShop</h1>
+    <h1>Coffee Shop</h1>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="orders.html">My Orders</a>
-      <a href="login.html" id="login-link">Login</a>
-      <button id="view-cart">Cart (<span id="cart-count">0</span>)</button>
+      <button id="view-cart">View Cart (<span id="cart-count">0</span>)</button>
+      <button id="logout-btn">Log Out</button>
     </nav>
   </header>
 
-  <main class="container">
-    <h2>Menu</h2>
-    <div id="menu-list" class="grid"></div>
-  </main>
+  <div class="container">
+    <!-- Banner -->
+    <div class="slogan-box">
+      <h2>Start your day with a perfect cup of coffee!</h2>
+      <p>Check out our freshly brewed menu and place your order online.</p>
+    </div>
 
+    <!-- Categories -->
+    <h2>Coffee</h2>
+    <div id="coffee-section" class="grid"></div>
+
+    <h2>Refreshers</h2>
+    <div id="refreshers-section" class="grid"></div>
+
+    <h2>Food</h2>
+    <div id="food-section" class="grid"></div>
+  </div>
+
+  <!-- Cart Modal -->
   <div id="cart-modal" class="modal hidden">
     <div class="modal-content">
-      <h3>Your Cart</h3>
+      <h2>Your Cart</h2>
       <div id="cart-items"></div>
       <div class="cart-footer">
         <div>Total: $<span id="cart-total">0.00</span></div>
-        <div>
-          <a href="checkout.html" class="btn">Checkout</a>
-          <button id="close-cart" class="btn secondary">Close</button>
-        </div>
+        <button class="btn" id="checkout-btn">Checkout</button>
+        <button class="btn secondary" id="close-cart">Close</button>
       </div>
     </div>
   </div>
 
   <script src="app.js"></script>
   <script>
-    // page-specific: load menu on page open
     document.addEventListener('DOMContentLoaded', () => {
-      window.api.loadMenuInto('#menu-list');
-    });
+      loadMenu();
+
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        window.location.href = '/';
+      });
+
+      document.getElementById('checkout-btn').addEventListener('click', async () => {
+      const cartItems = window.cart.get();
+      if (!cartItems.length) return alert('Cart is empty');
+
+      const customer = JSON.parse(localStorage.getItem('customer'));
+      if (!customer) return alert('You must be logged in to place an order');
+
+      try {
+        const resp = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_id: customer.id,
+          items: cartItems
+        })
+      });
+
+      if (resp.ok) {
+        alert('Order placed successfully!');
+        window.cart.clear();
+        document.getElementById('cart-modal').classList.add('hidden');
+      } else {
+        alert('Failed to place order');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  });
+
+  });
   </script>
 </body>
 </html>

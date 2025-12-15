@@ -1,99 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Checkout - CoffeeShop</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>CoffeeShop</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="orders.html">My Orders</a>
-      <a href="login.html" id="login-link">Login</a>
-    </nav>
-  </header>
+<table id="checkoutTable">
+<thead>
+<tr>
+    <th>Payment ID</th>
+    <th>Order ID</th>
+    <th>Customer</th>
+    <th>Amount</th>
+    <th>Status</th>
+    <th>Payment Date</th>
+    <th>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
 
-  <main class="container">
-    <h2>Checkout</h2>
-
-    <section id="cart-section">
-      <h3>Your Items</h3>
-      <div id="cart-items"></div>
-      <div class="cart-footer">
-        <div>Subtotal: $<span id="cart-total">0.00</span></div>
-      </div>
-    </section>
-
-    <section id="checkout-form">
-      <h3>Checkout Details</h3>
-      <label>
-        Logged-in user ID:
-        <input id="user-id" type="number" placeholder="Enter your user id" />
-      </label>
-
-      <label>
-        Payment method:
-        <select id="payment-method">
-          <option>Credit Card</option>
-          <option>Cash</option>
-          <option>Apple Pay</option>
-        </select>
-      </label>
-
-      <button id="place-order" class="btn">Place Order</button>
-
-      <div id="checkout-result" class="notice"></div>
-    </section>
-  </main>
-
-  <script src="app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      window.cartUI.refreshCartView();
-      document.getElementById('place-order').addEventListener('click', async () => {
-        const userId = document.getElementById('user-id').value;
-        if (!userId) {
-          alert('Please enter your user id (or log in).');
-          return;
+</table>
+    <script>
+    const paymentUrl = 'http://localhost:8080/api/payment';
+    
+    function fetchPayments(){
+        fetch(paymentUrl)
+            .then(res=>res.json())
+            .then(data=>{
+                const tbody = document.querySelector('#checkoutTable tbody');
+                tbody.innerHTML='';
+                data.forEach(pay=>{
+                    const row = document.createElement('tr');
+                    row.innerHTML=`
+                        <td>${pay.payment_id}</td>
+                        <td>${pay.order ? pay.order.order_id : ''}</td>
+                        <td>${pay.order && pay.order.customer ? pay.order.customer.f_name+' '+pay.order.customer.l_name : ''}</td>
+                        <td>${pay.amount.toFixed(2)}</td>
+                        <td>
+                            <select class="edit-status">
+                                <option value="pending" ${pay.status=='pending'?'selected':''}>Pending</option>
+                                <option value="completed" ${pay.status=='completed'?'selected':''}>Completed</option>
+                            </select>
+                        </td>
+                        <td>${new Date(pay.payment_date).toLocaleString()}</td>
+                        <td>
+                            <button class="btn" onclick="updatePayment(${pay.payment_id}, this)">Update</button>
+                            <button class="btn secondary" onclick="deletePayment(${pay.payment_id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+    }
+    
+    fetchPayments();
+    
+    function updatePayment(id, btn){
+        const row = btn.closest('tr');
+        const updated = {
+            status: row.querySelector('.edit-status').value
+        };
+        fetch(`${paymentUrl}/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(updated)})
+            .then(res=>{if(res.ok) fetchPayments()});
+    }
+    
+    function deletePayment(id){
+        if(confirm('Delete this payment?')){
+            fetch(`${paymentUrl}/${id}`, {method:'DELETE'}).then(res=>{if(res.ok) fetchPayments()});
         }
-
-        // Build order total from cart
-        const cart = window.cart.get();
-        if (!cart.length) { alert('Cart is empty'); return; }
-
-        const total = window.cart.total();
-        // Place order: POST /api/orders?userId=...
-        try {
-          const orderResp = await fetch(`/api/orders?userId=${encodeURIComponent(userId)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ total: total, status: 'PLACED' })
-          });
-          const order = await orderResp.json();
-
-          // Then create payment record
-          const payResp = await fetch(`/api/payments?orderId=${order.order_id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ method: document.getElementById('payment-method').value })
-          });
-          const payment = await payResp.json();
-
-          // Clear cart
-          window.cart.clear();
-          window.cartUI.refreshCartView();
-
-          document.getElementById('checkout-result').textContent = `Order #${order.order_id} placed. Payment id: ${payment.payment_id}`;
-        } catch (e) {
-          console.error(e);
-          alert('There was a problem placing the order.');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+    }
+    
+    </script>
+    
